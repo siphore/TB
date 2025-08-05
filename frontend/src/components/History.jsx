@@ -170,7 +170,9 @@ const History = () => {
     let retryTimeout;
 
     const connectWebSocket = () => {
-      const socket = new WebSocket("ws://localhost:4000");
+      const socket = new WebSocket(
+        import.meta.env.VITE_WS_URL || "ws://localhost:4000"
+      );
       socketRef.current = socket;
 
       socket.onopen = () => {

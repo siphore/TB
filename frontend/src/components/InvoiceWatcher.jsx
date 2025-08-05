@@ -192,7 +192,9 @@ const InvoiceWatcher = () => {
     let retryTimeout;
 
     const connectWebSocket = () => {
-      socket = new WebSocket("ws://localhost:4000");
+      const socket = new WebSocket(
+        import.meta.env.VITE_WS_URL || "ws://localhost:4000"
+      );
       socketRef.current = socket;
 
       socket.onopen = () => {
