@@ -7,7 +7,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 const fetchInvoicesLog = async () => {
   try {
-    const req = await fetch("http://localhost:4000/api/logs/invoices");
+    const req = await fetch(`${apiUrl}/api/logs/invoices`);
     const res = await req.json();
     return res;
   } catch (err) {
@@ -18,7 +18,7 @@ const fetchInvoicesLog = async () => {
 
 const fetchInvoiceById = async (itemId) => {
   try {
-    const res = await fetch("http://localhost:4000/invoice", {
+    const res = await fetch(`${apiUrl}/invoice`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

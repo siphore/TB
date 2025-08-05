@@ -21,7 +21,6 @@ app.use(
   cors({
     origin: allowedOrigins,
     credentials: true, // if you're using cookies or Authorization headers
-    optionsSuccessStatus: 200,
   })
 );
 
