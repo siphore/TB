@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@theme {
+  --color-pink: #e73a84;
+  --color-offwhite: #ebefe5;
+}
+
+body {
+  position: relative;
+  font-family: Arial, Helvetica, sans-serif;
+  z-index: 0;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: url("./assets/images/background.svg") no-repeat center center
+    fixed;
+  background-size: cover;
+  transition: filter 0.3s ease;
+  pointer-events: none;
+}
+
+body.dark::before {
+  filter: brightness(0.75);
+}
+
+body.light::before {
+  filter: brightness(1);
+}
