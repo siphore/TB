@@ -211,7 +211,6 @@ const InvoiceWatcher = () => {
     });
 
     socket.on("INVOICE_SELECTED", (data) => {
-      console.log(data);
       setInvoiceTitle("📬 Facture sélectionnée");
       storeData("latestInvoice", { itemId: data.id });
       fetchInvoiceById(data.id);

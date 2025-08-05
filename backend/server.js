@@ -18,26 +18,27 @@ const corsOptions = {
   credentials: true,
 };
 
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  res.setHeader("Access-Control-Allow-Credentials", "true");
+// app.use((req, res, next) => {
+//   console.log(req.headers.origin);
+//   res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+//   res.setHeader(
+//     "Access-Control-Allow-Methods",
+//     "GET, POST, PUT, DELETE, OPTIONS"
+//   );
+//   res.setHeader(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept"
+//   );
+//   res.setHeader("Access-Control-Allow-Credentials", "true");
 
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
+//   if (req.method === "OPTIONS") {
+//     return res.sendStatus(200);
+//   }
 
-  next();
-});
+//   next();
+// });
 
 app.use(express.json());
 
@@ -50,29 +51,6 @@ app.use("/", logRoutes);
 const server = app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
-
-// let sockets = [];
-// setSockets(sockets);
-
-// const wss = new WebSocketServer({ server });
-
-// wss.on("connection", (socket) => {
-//   sockets.push(socket);
-
-//   socket.on("message", (data) => {
-//     const text = data.toString();
-//     sockets.forEach((s) => {
-//       if (s !== socket && s.readyState === 1) {
-//         s.send(text);
-//       }
-//     });
-//   });
-
-//   socket.on("close", () => {
-//     sockets = sockets.filter((s) => s !== socket);
-//     setSockets(sockets);
-//   });
-// });
 
 const io = new Server(server, {
   cors: {
