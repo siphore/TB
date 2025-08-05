@@ -2,12 +2,13 @@ import React, { useEffect, useState, useRef, useContext } from "react";
 import { LatestInvoiceContext } from "../helpers/LatestInvoiceContext";
 import { storeData, loadData } from "../helpers/localData";
 import { useTheme } from "../helpers/ThemeContext";
+import { io } from "socket.io-client";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const fetchInvoicesLog = async () => {
   try {
-    const req = await fetch(`${apiUrl}/api/logs/invoices`);
+    const req = await fetch(`${apiUrl}/logs/invoices`);
     const res = await req.json();
     return res;
   } catch (err) {
@@ -58,10 +59,8 @@ const History = () => {
       return;
     }
 
-    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-      socketRef.current.send(
-        JSON.stringify({ type: "INVOICE_SELECTED", data: invoice })
-      );
+    if (socketRef.current && socketRef.current.connected) {
+      socketRef.current.emit("INVOICE_SELECTED", invoice);
 
       // Update selected invoice state
       setInvoices((prev) =>
@@ -133,13 +132,8 @@ const History = () => {
 
         const data = await res.json();
 
-        if (
-          socketRef.current &&
-          socketRef.current.readyState === WebSocket.OPEN
-        ) {
-          socketRef.current.send(
-            JSON.stringify({ type: "INVOICE_SENT", data: currentInvoice })
-          );
+        if (socketRef.current && socketRef.current.connected) {
+          socketRef.current.emit("INVOICE_SENT", currentInvoice);
         } else {
           console.warn("WebSocket not connected");
         }
@@ -169,51 +163,46 @@ const History = () => {
   useEffect(() => {
     let retryTimeout;
 
-    const connectWebSocket = () => {
-      const socket = new WebSocket(
-        import.meta.env.VITE_WS_URL || "ws://localhost:4000"
-      );
+    const connectSocketIO = () => {
+      const socket = io("http://localhost:4000");
       socketRef.current = socket;
 
-      socket.onopen = () => {
-        console.log("✅ WebSocket 2 connected");
-      };
+      socket.on("connect", () => {
+        console.log("✅ Socket.IO connected");
+      });
 
-      socket.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-        if (msg.type === "INVOICE_SENT") {
-          fetchInvoiceById(msg.data.id).then((invoice) => {
-            if (!invoice) return;
+      socket.on("disconnect", () => {
+        console.warn("⚠️ Socket.IO disconnected. Retrying in 2s...");
+        retryTimeout = setTimeout(connectSocketIO, 2000);
+      });
 
-            // Update sent invoice state
-            setInvoices((prev) =>
-              prev.map((inv) =>
-                inv.id === invoice.id ? { ...inv, isSent: true } : inv
-              )
-            );
-            invoice.isSent = true;
-          });
-        } else if (msg.type === "INVOICE_CREATED") {
-          console.log("📬 Nouvel invoice reçu !");
-          loadLogs();
-          fetchPage();
-        }
-      };
+      socket.on("INVOICE_SENT", (data) => {
+        fetchInvoiceById(data.id).then((invoice) => {
+          if (!invoice) return;
 
-      socket.onerror = (err) => {
-        console.error("WebSocket error:", err);
-      };
+          setInvoices((prev) =>
+            prev.map((inv) =>
+              inv.id === invoice.id ? { ...inv, isSent: true } : inv
+            )
+          );
+        });
+      });
 
-      socket.onclose = () => {
-        console.warn("⚠️ WebSocket closed. Retrying in 2s...");
-        retryTimeout = setTimeout(connectWebSocket, 2000);
-      };
+      socket.on("INVOICE_CREATED", () => {
+        console.log("📬 Nouvelle facture !");
+        loadLogs();
+        fetchPage();
+      });
+
+      socket.on("connect_error", (err) => {
+        console.error("❌ Connection error:", err);
+      });
     };
 
-    setTimeout(connectWebSocket, 500);
+    connectSocketIO();
 
     return () => {
-      if (socketRef.current) socketRef.current.close();
+      if (socketRef.current) socketRef.current.disconnect();
       clearTimeout(retryTimeout);
     };
   }, []);

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext, useRef } from "react";
 import { LatestInvoiceContext } from "../helpers/LatestInvoiceContext";
 import { storeData, loadData, deleteData } from "../helpers/localData";
 import { useTheme } from "../helpers/ThemeContext";
+import { io } from "socket.io-client";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const dateOptions = {
@@ -165,15 +166,10 @@ const InvoiceWatcher = () => {
 
       const data = await res.json();
 
-      if (
-        socketRef.current &&
-        socketRef.current.readyState === WebSocket.OPEN
-      ) {
-        socketRef.current.send(
-          JSON.stringify({ type: "INVOICE_SENT", data: latestInvoice })
-        );
+      if (socketRef.current && socketRef.current.connected) {
+        socketRef.current.emit("INVOICE_SENT", latestInvoice);
       } else {
-        console.warn("WebSocket not connected");
+        console.warn("Socket.IO not connected");
       }
 
       console.log("✅ Winbiz API response:", data);
@@ -188,66 +184,52 @@ const InvoiceWatcher = () => {
   };
 
   useEffect(() => {
-    let socket;
     let retryTimeout;
 
-    const connectWebSocket = () => {
-      const socket = new WebSocket(
-        import.meta.env.VITE_WS_URL || "ws://localhost:4000"
-      );
-      socketRef.current = socket;
+    const socket = io("http://localhost:4000");
+    socketRef.current = socket;
 
-      socket.onopen = () => {
-        console.log("✅ WebSocket connected");
-        const latestInvoice = loadData("latestInvoice");
-        if (latestInvoice) {
-          fetchInvoiceById(latestInvoice.itemId);
-        }
-      };
+    socket.on("connect", () => {
+      console.log("✅ Socket.IO connected");
 
-      socket.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-        if (
-          msg.type === "INVOICE_CREATED" ||
-          msg.type === "INVOICE_UPDATED" ||
-          msg.type === "INVOICE_SELECTED"
-        ) {
-          let id;
-          switch (msg.type) {
-            case "INVOICE_CREATED":
-              setInvoiceTitle("📬 Nouvelle facture reçue !");
-              storeData("latestInvoice", msg.data);
-              id = msg.data.itemId;
-              break;
-            case "INVOICE_UPDATED":
-              setInvoiceTitle("📬 Facture mise à jour !");
-              storeData("latestInvoice", msg.data);
-              id = msg.data.itemId;
-              break;
-            case "INVOICE_SELECTED":
-              setInvoiceTitle("📬 Facture sélectionnée");
-              storeData("latestInvoice", { itemId: msg.data.id });
-              id = msg.data.id;
-              break;
-          }
-          fetchInvoiceById(id);
-        }
-      };
+      const latestInvoice = loadData("latestInvoice");
+      if (latestInvoice) {
+        fetchInvoiceById(latestInvoice.itemId);
+      }
+    });
 
-      socket.onerror = (err) => {
-        console.error("WebSocket error:", err);
-      };
+    socket.on("INVOICE_CREATED", (data) => {
+      setInvoiceTitle("📬 Nouvelle facture reçue !");
+      storeData("latestInvoice", data);
+      fetchInvoiceById(data.itemId);
+    });
 
-      socket.onclose = () => {
-        console.warn("⚠️ WebSocket closed. Retrying in 2s...");
-        retryTimeout = setTimeout(connectWebSocket, 2000);
-      };
-    };
+    socket.on("INVOICE_UPDATED", (data) => {
+      setInvoiceTitle("📬 Facture mise à jour !");
+      storeData("latestInvoice", data);
+      fetchInvoiceById(data.itemId);
+    });
 
-    setTimeout(connectWebSocket, 500);
+    socket.on("INVOICE_SELECTED", (data) => {
+      console.log(data);
+      setInvoiceTitle("📬 Facture sélectionnée");
+      storeData("latestInvoice", { itemId: data.id });
+      fetchInvoiceById(data.id);
+    });
+
+    socket.on("disconnect", () => {
+      console.warn("⚠️ Socket.IO disconnected. Retrying in 2s...");
+      retryTimeout = setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("❌ Socket.IO error:", err);
+    });
 
     return () => {
-      if (socket) socket.close();
+      socket.disconnect();
       clearTimeout(retryTimeout);
     };
   }, []);

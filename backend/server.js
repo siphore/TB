@@ -7,6 +7,7 @@ import jobberRoutes from "./routes/softwares/jobber.js";
 import winbizRoutes from "./routes/softwares/winbiz.js";
 import webhookRoutes, { setSockets } from "./routes/webhook.js";
 import logRoutes from "./routes/logs.js";
+import { Server } from "socket.io";
 dotenv.config();
 
 const app = express();
@@ -25,12 +26,7 @@ app.use(
 );
 
 app.use((req, res, next) => {
-  if (req.headers.host.startsWith("www.")) {
-    return res.redirect(301, `https://${req.headers.host.slice(4)}${req.url}`);
-  }
-  if (!req.secure) {
-    return res.redirect(301, `https://${req.headers.host}${req.url}`);
-  }
+  console.log("Incoming request origin:", req.headers.origin);
   next();
 });
 
@@ -46,25 +42,53 @@ const server = app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
 
-let sockets = [];
-setSockets(sockets);
+// let sockets = [];
+// setSockets(sockets);
 
-const wss = new WebSocketServer({ server });
+// const wss = new WebSocketServer({ server });
 
-wss.on("connection", (socket) => {
-  sockets.push(socket);
+// wss.on("connection", (socket) => {
+//   sockets.push(socket);
 
-  socket.on("message", (data) => {
-    const text = data.toString();
-    sockets.forEach((s) => {
-      if (s !== socket && s.readyState === 1) {
-        s.send(text);
-      }
-    });
+//   socket.on("message", (data) => {
+//     const text = data.toString();
+//     sockets.forEach((s) => {
+//       if (s !== socket && s.readyState === 1) {
+//         s.send(text);
+//       }
+//     });
+//   });
+
+//   socket.on("close", () => {
+//     sockets = sockets.filter((s) => s !== socket);
+//     setSockets(sockets);
+//   });
+// });
+
+const io = new Server(server, {
+  cors: {
+    origin: ["https://invoice-review.ouidoo.ch", "http://localhost:5173"],
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("🔌 New client connected");
+
+  socket.on("INVOICE_CREATED", (data) => {
+    socket.broadcast.emit("INVOICE_CREATED", data);
   });
 
-  socket.on("close", () => {
-    sockets = sockets.filter((s) => s !== socket);
-    setSockets(sockets);
+  socket.on("INVOICE_SENT", (data) => {
+    socket.broadcast.emit("INVOICE_SENT", data);
+  });
+
+  socket.on("INVOICE_SELECTED", (data) => {
+    socket.broadcast.emit("INVOICE_SELECTED", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("🔌 Client disconnected");
   });
 });
