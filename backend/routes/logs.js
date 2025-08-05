@@ -3,7 +3,7 @@ import fs from "fs";
 
 const router = express.Router();
 
-router.get("/api/logs/invoices", (req, res) => {
+router.get("/logs/invoices", (req, res) => {
   const logPath = "./softwares/jobber/invoices.log";
 
   if (!fs.existsSync(logPath))
