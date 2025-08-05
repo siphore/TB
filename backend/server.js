@@ -43,6 +43,12 @@ app.use("/", winbizRoutes);
 app.use("/", webhookRoutes);
 app.use("/", logRoutes);
 
+app.use((req, res) => {
+  res.header("Access-Control-Allow-Origin", "https://invoice-review.ouidoo.ch");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.status(404).json({ error: "Not found" });
+});
+
 const server = app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
