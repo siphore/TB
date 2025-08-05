@@ -24,6 +24,16 @@ app.use(
   })
 );
 
+app.use((req, res, next) => {
+  if (req.headers.host.startsWith("www.")) {
+    return res.redirect(301, `https://${req.headers.host.slice(4)}${req.url}`);
+  }
+  if (!req.secure) {
+    return res.redirect(301, `https://${req.headers.host}${req.url}`);
+  }
+  next();
+});
+
 app.use(express.json());
 
 app.use("/", authorizeRoutes);
