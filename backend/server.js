@@ -12,14 +12,19 @@ dotenv.config();
 const app = express();
 const PORT = 4000;
 
-const allowedOrigins = ["https://invoice-review.ouidoo.ch", "http://localhost:5173"];
+const allowedOrigins = [
+  "https://invoice-review.ouidoo.ch",
+  "http://localhost:5173",
+];
 
 app.use(
   cors({
     origin: allowedOrigins,
-    // credentials: true, // if you're using cookies or Authorization headers
+    credentials: true, // if you're using cookies or Authorization headers
+    optionsSuccessStatus: 200,
   })
 );
+
 app.use(express.json());
 
 app.use("/", authorizeRoutes);
