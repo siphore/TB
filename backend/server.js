@@ -22,7 +22,7 @@ app.use("/", webhookRoutes);
 app.use("/", logRoutes);
 
 const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
 
 let sockets = [];
