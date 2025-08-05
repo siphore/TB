@@ -1,11 +1,22 @@
-app.get("/authorize", (req, res) => {
+import express from "express";
+import axios from "axios";
+import dotenv from "dotenv";
+dotenv.config();
+
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const REDIRECT_URI = "http://localhost:4000/callback";
+
+const router = express.Router();
+
+router.get("/authorize", (req, res) => {
   const authUrl = `https://api.getjobber.com/api/oauth/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
     REDIRECT_URI
   )}&scope=read_clients read_invoices offline_access`;
   res.redirect(authUrl);
 });
 
-app.get("/callback", async (req, res) => {
+router.get("/callback", async (req, res) => {
   const { code } = req.query;
   console.log(code);
 
@@ -37,3 +48,5 @@ app.get("/callback", async (req, res) => {
     res.status(500).send("❌ Token exchange failed");
   }
 });
+
+export default router;
