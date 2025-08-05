@@ -20,3 +20,8 @@ pnpm-debug.log*
 
 # VSCode
 .vscode/
+
+# Project specific
+tokens.json
+invoices.log
+bizexdoc_winbiz.wdx
