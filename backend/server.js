@@ -13,31 +13,12 @@ dotenv.config();
 const app = express();
 const PORT = 4000;
 
-const allowedOrigins = [
-  "https://invoice-review.ouidoo.ch",
-  "http://localhost:5173",
-];
+const corsOptions = {
+  origin: ["https://invoice-review.ouidoo.ch", "http://localhost:5173"],
+  credentials: true,
+};
 
-// app.use(
-//   cors({
-//     origin: allowedOrigins,
-//     credentials: true, // if you're using cookies or Authorization headers
-//   })
-// );
-
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Accept"
-    );
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  }
-  next();
-});
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
