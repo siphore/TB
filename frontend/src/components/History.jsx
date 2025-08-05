@@ -8,7 +8,14 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 const fetchInvoicesLog = async () => {
   try {
-    const req = await fetch(`${apiUrl}/logs/invoices`);
+    const req = await fetch(`${apiUrl}/logs/invoices`, {
+      method: "GET",
+      credentials: "include", // ✅ allow cookies and headers
+      headers: {
+        "Content-Type": "application/json", // optional for GET but fine
+      },
+    });
+
     const res = await req.json();
     return res;
   } catch (err) {
@@ -164,7 +171,7 @@ const History = () => {
     let retryTimeout;
 
     const connectSocketIO = () => {
-      const socket = io("http://localhost:4000");
+      const socket = io(apiUrl);
       socketRef.current = socket;
 
       socket.on("connect", () => {

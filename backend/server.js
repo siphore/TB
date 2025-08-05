@@ -18,15 +18,24 @@ const allowedOrigins = [
   "http://localhost:5173",
 ];
 
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true, // if you're using cookies or Authorization headers
-  })
-);
+// app.use(
+//   cors({
+//     origin: allowedOrigins,
+//     credentials: true, // if you're using cookies or Authorization headers
+//   })
+// );
 
 app.use((req, res, next) => {
-  console.log("Incoming request origin:", req.headers.origin);
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept"
+    );
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  }
   next();
 });
 

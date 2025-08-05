@@ -186,7 +186,7 @@ const InvoiceWatcher = () => {
   useEffect(() => {
     let retryTimeout;
 
-    const socket = io("http://localhost:4000");
+    const socket = io(apiUrl);
     socketRef.current = socket;
 
     socket.on("connect", () => {
