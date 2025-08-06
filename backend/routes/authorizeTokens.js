@@ -3,7 +3,7 @@ import { exchangeCodeForToken } from "../helpers/jobberAuth.js";
 
 const router = express.Router();
 
-router.get("/authorize", (req, res) => {
+router.get("/", (req, res) => {
   const authUrl = `https://api.getjobber.com/api/oauth/authorize?response_type=code&client_id=${
     process.env.CLIENT_ID
   }&redirect_uri=${encodeURIComponent(
