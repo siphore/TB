@@ -15,15 +15,23 @@ dotenv.config();
 const app = express();
 const PORT = 4000;
 const FRONTEND_URL = process.env.FRONTEND_URL;
-const JWT_SECRET = process.env.JWT_SECRET || "your-fallback-secret";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // --- CORS config ---
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", FRONTEND_URL);
+  if (req.method === "OPTIONS") {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_URL);
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    return res.sendStatus(204);
+  }
+  next();
+});
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", process.env.FRONTEND_URL);
   res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  if (req.method === "OPTIONS") return res.sendStatus(204);
   next();
 });
 
