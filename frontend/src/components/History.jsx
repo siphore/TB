@@ -5,6 +5,7 @@ import { useTheme } from "../helpers/ThemeContext";
 import { io } from "socket.io-client";
 
 const apiUrl = import.meta.env.VITE_API_URL;
+const token = localStorage.getItem("token");
 
 const fetchInvoicesLog = async () => {
   try {
@@ -13,6 +14,7 @@ const fetchInvoicesLog = async () => {
       credentials: "include", // ✅ allow cookies and headers
       headers: {
         "Content-Type": "application/json", // optional for GET but fine
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -26,10 +28,11 @@ const fetchInvoicesLog = async () => {
 
 const fetchInvoiceById = async (itemId) => {
   try {
-    const res = await fetch(`${apiUrl}/invoice`, {
+    const res = await fetch(`${apiUrl}/jobber/invoice`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ itemId }),
     });
@@ -133,6 +136,7 @@ const History = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(currentInvoice),
         });

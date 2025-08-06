@@ -31,7 +31,7 @@ CHhnF9XSAJTpnWzeWQIDAQAB
   return encryptedBase64;
 };
 
-router.post("/winbiz", async (req, res) => {
+router.post("/", async (req, res) => {
   const general = req.body;
   const client = req.body.client;
   const billingAddress = req.body.billingAddress;
@@ -175,7 +175,7 @@ router.post("/winbiz", async (req, res) => {
   }
 });
 
-router.post("/winbiz/folders", async (req, res) => {
+router.post("/folders", async (req, res) => {
   try {
     const response = await fetch(WINBIZ_API, {
       method: "POST",
