@@ -112,7 +112,6 @@ router.post("/winbiz", async (req, res) => {
     fields[6] = "CHF"; // Code ISO de la monnaie
     fields[10] = "<AUTO>"; // Compte collectif de tiers
     fields[11] = "<AUTO>"; // Compte d'escompte
-    // fields[12] = "F"; // Langue
 
     // Adresse
     // fields[19] = addressCode; // Code adresse
@@ -122,11 +121,8 @@ router.post("/winbiz", async (req, res) => {
     fields[26] = npa; // Numéro postal
     fields[27] = city; // Ville, localité
     fields[28] = "CH"; // Code pays ISO
-    // fields[29] = country; // Pays
-    // fields[30] = langue; // Langue
     fields[31] = phone; // Téléphone 1
     fields[35] = email; // Email
-    // fields[44] = gender; // Titre civil
     fields[46] = "2"; // Mise à jour de l'adresse
 
     // Lignes
@@ -136,7 +132,6 @@ router.post("/winbiz", async (req, res) => {
     fields[51] = lineDate; // Date de ligne
     fields[52] = lineItem.quantity; // Quantité
     fields[53] = lineItem.unitPrice; // Prix monaie locale
-    // fields[54] = "H"; // Unité
     fields[56] = lineItem.totalPrice; // Montant total de la ligne
     fields[59] = "<AUTO>"; // Compte chiffre d'affaires
     fields[60] = tva; // TVA %
