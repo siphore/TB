@@ -67,10 +67,10 @@ export default async function makeAuthorizedRequest(requestFn) {
   if (!tokenData) throw new Error("No token data found");
 
   try {
-    return await requestFn(tokenData.accessToken);
+    return await requestFn(tokenData.access_token);
   } catch (err) {
     if (err.response?.status === 401) {
-      const newAccessToken = await refreshAccessToken(tokenData.refreshToken);
+      const newAccessToken = await refreshAccessToken(tokenData.refresh_token);
       return await requestFn(newAccessToken);
     }
     throw err;
