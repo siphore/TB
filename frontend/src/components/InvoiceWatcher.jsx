@@ -108,7 +108,6 @@ const InvoiceWatcher = () => {
   );
   const socketRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
-  // const [gender, setGender] = useState("M");
   const { theme } = useTheme();
 
   const fetchInvoiceById = async (itemId) => {
@@ -138,14 +137,6 @@ const InvoiceWatcher = () => {
   };
 
   const sendData = async () => {
-    // const enrichedInvoice = {
-    //   ...latestInvoice,
-    //   client: {
-    //     ...latestInvoice.client,
-    //     gender: gender,
-    //   },
-    // };
-
     if (localStorage.getItem("sentInvoices")?.includes(latestInvoice.id)) {
       const userConfirmed = window.confirm(
         "Cette facture a déjà été envoyée. Voulez-vous l'envoyer à nouveau ?"
@@ -281,48 +272,6 @@ const InvoiceWatcher = () => {
 
         {/* Client */}
         <SectionTitle name="Client" />
-        {/* <SectionItem
-          name="Civilité"
-          data={
-            <div className="flex gap-5">
-              <div className="flex gap-2">
-                <input
-                  type="radio"
-                  id="M"
-                  name="gender"
-                  value="M"
-                  checked={gender === "M"}
-                  onChange={(e) => setGender(e.target.value)}
-                />
-                <label htmlFor="M">Monsieur</label>
-              </div>
-
-              <div className="flex gap-2">
-                <input
-                  type="radio"
-                  id="F"
-                  name="gender"
-                  value="F"
-                  checked={gender === "F"}
-                  onChange={(e) => setGender(e.target.value)}
-                />
-                <label htmlFor="F">Madame</label>
-              </div>
-
-              <div className="flex gap-2">
-                <input
-                  type="radio"
-                  id="A"
-                  name="gender"
-                  value="A"
-                  checked={gender === "A"}
-                  onChange={(e) => setGender(e.target.value)}
-                />
-                <label htmlFor="A">Autre</label>
-              </div>
-            </div>
-          }
-        /> */}
         <SectionItem
           name="Prénom Nom"
           data={

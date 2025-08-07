@@ -19,10 +19,10 @@ function Login({ setAuthenticated }) {
 
       const data = await res.json();
 
-      // ✅ Save token in localStorage
+      // Save token in localStorage
       localStorage.setItem("token", data.token);
 
-      // ✅ Tell parent we're authenticated
+      // Tell parent we're authenticated
       setAuthenticated(true);
       window.location.reload();
     } catch (err) {

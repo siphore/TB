@@ -16,7 +16,7 @@ function App() {
   const [latestInvoice, setLatestInvoice] = useState(null);
   const [isTourActive, setIsTourActive] = useState(false);
 
-  // ✅ Define driverObj using useMemo so it's stable across renders
+  // driverObj is defined using useMemo so it's stable across renders
   const driverObj = useMemo(
     () =>
       driver({
@@ -77,7 +77,7 @@ function App() {
     []
   );
 
-  // ✅ Trigger guided tour on first visit
+  // Trigger guided tour on first visit
   useEffect(() => {
     if (localStorage.getItem("firstVisit") === "false") return;
 
@@ -112,7 +112,7 @@ function App() {
       });
   }, [apiUrl]);
 
-  // 🔒 Show login if not authenticated
+  // Show login if not authenticated
   if (authenticated === false)
     return <Login setAuthenticated={setAuthenticated} />;
   if (authenticated === null) return <div>Loading...</div>;
