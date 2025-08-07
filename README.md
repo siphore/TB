@@ -2,13 +2,15 @@
 
 A full-stack application built to automate the transfer of invoice data from **Jobber** to **Winbiz Cloud**, eliminating double data entry and improving operational efficiency for **Ouidoo SA**.
 
+Because of all the secret variables in the .env files you'll see down below, you won't be able to run this program locally (unless you have the right values). I am sorry about that, but since this program is handling real clients data, I did not want to give anybody the opportunity to use this carelessly. I hope you understand.
+
 ## 📦 Project Structure
 
 ```
 project-root/
 ├── backend/
 ├── frontend/
-└── README.md        # You're here
+└── README.md
 ```
 
 ---
@@ -59,18 +61,25 @@ cd jobber-winbiz-integration
 
 #### 🔐 Backend `.env`
 
+In `/backend/.env`:
+
 ```env
 PORT=4000
+API_URL=http://localhost:4000
 FRONTEND_URL=http://localhost:5173
 
 # Jobber API
 CLIENT_ID=your-jobber-client-id
 CLIENT_SECRET=your-jobber-client-secret
-API_URL=http://localhost:4000
+ENCRYPT_PASSWORD=your-jobber-password
+
+# Winbiz API
+WINBIZ_KEY=your-winbiz-key
+WINBIZ_PWD=your-winbiz-password
 
 # Login
 LOGIN_USERNAME=admin
-LOGIN_PASSWORD=supersecure
+LOGIN_PASSWORD=Ouidoo2025
 
 # JWT
 JWT_SECRET=your-secret-key
@@ -159,16 +168,10 @@ npm run dev
 
 ## ✅ To Do / Improvements
 
-- [ ] Store logs in a database (currently JSON or memory)
+- [ ] Store logs in a database (currently JSON or localStorage)
 - [ ] Better error handling for Winbiz file imports
 - [ ] Admin panel to manage Jobber credentials
 - [ ] Multi-user support
-
----
-
-## 📄 License
-
-MIT — Use this freely, credit appreciated.
 
 ---
 
