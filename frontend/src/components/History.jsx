@@ -11,9 +11,9 @@ const fetchInvoicesLog = async () => {
   try {
     const req = await fetch(`${apiUrl}/logs/invoices`, {
       method: "GET",
-      credentials: "include", // ✅ allow cookies and headers
+      credentials: "include", // Allow cookies and headers
       headers: {
-        "Content-Type": "application/json", // optional for GET but fine
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });

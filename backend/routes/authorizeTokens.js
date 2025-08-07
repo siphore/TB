@@ -19,7 +19,7 @@ router.get("/callback", async (req, res) => {
 
   try {
     await exchangeCodeForToken(code);
-    res.send("<h1>✅ Authorization successful!</h1>");
+    res.redirect(process.env.FRONTEND_URL);
   } catch (err) {
     console.error("❌ Callback error:", err.message);
     res.status(500).send("❌ Authorization failed");

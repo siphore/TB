@@ -1,8 +1,50 @@
+import { useEffect, useState } from "react";
 import { Images } from "../assets/";
 import { useTheme } from "../helpers/ThemeContext";
 
+const refreshTokens = () => {
+  window.location.href = `${import.meta.env.VITE_API_URL}/authorize`;
+};
+
 const Header = ({ driverObj, isTourActive, setIsTourActive }) => {
   const { theme, toggleTheme } = useTheme();
+  const [tokenStatus, setTokenStatus] = useState("idle"); // "ok", "unauthorized", "error"
+
+  useEffect(() => {
+    const check = async () => {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/jobber/invoice`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            body: JSON.stringify({
+              itemId: "Z2lkOi8vSm9iYmVyL0ludm9pY2UvMTI5MjE1NTk3",
+            }),
+          }
+        );
+
+        if (res.status === 401) {
+          setTokenStatus("unauthorized");
+          refreshTokens();
+        } else if (res.status === 500) {
+          setTokenStatus("serverError");
+        } else if (res.ok) {
+          setTokenStatus("ok");
+        } else {
+          setTokenStatus("error");
+        }
+      } catch (err) {
+        setTokenStatus("error");
+      }
+    };
+
+    check();
+  }, []);
 
   return (
     <header
@@ -28,6 +70,7 @@ const Header = ({ driverObj, isTourActive, setIsTourActive }) => {
         </a>
 
         <div className="flex items-center gap-7">
+          {/* 🌗 Toggle theme */}
           <svg
             viewBox="0 0 24 24"
             fill={`${theme === "dark" ? "yellow" : "none"}`}
@@ -36,17 +79,15 @@ const Header = ({ driverObj, isTourActive, setIsTourActive }) => {
             className="w-8 h-8 cursor-pointer hover:scale-110 transition"
             onClick={toggleTheme}
           >
-            <g id="SVGRepo_iconCarrier">
-              <path
-                d="M3.32031 11.6835C3.32031 16.6541 7.34975 20.6835 12.3203 20.6835C16.1075 20.6835 19.3483 18.3443 20.6768 15.032C19.6402 15.4486 18.5059 15.6834 17.3203 15.6834C12.3497 15.6834 8.32031 11.654 8.32031 6.68342C8.32031 5.50338 8.55165 4.36259 8.96453 3.32996C5.65605 4.66028 3.32031 7.89912 3.32031 11.6835Z"
-                // stroke="#000000"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              ></path>
-            </g>
+            <path
+              d="M3.32031 11.6835C3.32031 16.6541 7.34975 20.6835 12.3203 20.6835C16.1075 20.6835 19.3483 18.3443 20.6768 15.032C19.6402 15.4486 18.5059 15.6834 17.3203 15.6834C12.3497 15.6834 8.32031 11.654 8.32031 6.68342C8.32031 5.50338 8.55165 4.36259 8.96453 3.32996C5.65605 4.66028 3.32031 7.89912 3.32031 11.6835Z"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            ></path>
           </svg>
 
+          {/* ❓ Info tour */}
           <svg
             id="infos"
             viewBox="0 0 48 48"
@@ -65,6 +106,20 @@ const Header = ({ driverObj, isTourActive, setIsTourActive }) => {
               <circle cx="24" cy="14" r="2"></circle>
             </g>
           </svg>
+
+          {/* 🔄 Refresh tokens */}
+          <div
+            className={`w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition ${
+              tokenStatus === "ok"
+                ? "bg-green-500"
+                : tokenStatus === "unauthorized"
+                ? "bg-yellow-500"
+                : tokenStatus === "serverError"
+                ? "bg-red-500"
+                : "bg-gray-400"
+            }`}
+            onClick={refreshTokens}
+          />
         </div>
       </div>
     </header>

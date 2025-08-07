@@ -67,6 +67,10 @@ router.post("/invoice", async (req, res) => {
   `;
 
   try {
+    if (!itemId) {
+      return res.status(400).json({ error: "Missing itemId" });
+    }
+
     const result = await makeAuthorizedRequest(async (token) => {
       const client = getGraphQLClient(token);
       return await client.request(query, { id: itemId });
